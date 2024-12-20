@@ -8,6 +8,7 @@
 
 import argparse
 from argparse import Namespace
+from loguru import logger
 
 from apple_health_parser.utils.parser import Parser
 from apple_health_parser.plot import Plot
@@ -41,8 +42,16 @@ def process_data(path: str) -> None:
 
     for flag in available_flags:
         data = parser.get_flag_records(flag=flag)
+
+        # plot data
         plt = Plot(data=data, operation="sum")
         plt.plot(save=True)
+
+        # log basic stats
+        data_name = flag.replace("HKQuantityTypeIdentifier", "")
+        data_sum = sum(data.records["value"])
+        units = data.records["unit"][0]
+        logger.info(f"{data_name}: {data_sum} ({units})")
 
 
 if __name__ == "__main__":
